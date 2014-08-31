@@ -442,7 +442,6 @@
                   <Connection code="&quot;&quot;" type="code"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
-                <Property name="scrollOffset" type="int" value="0"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel10">

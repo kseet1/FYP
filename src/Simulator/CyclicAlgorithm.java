@@ -88,7 +88,7 @@ public class CyclicAlgorithm {
 
             if (nextNodeToVisit == nextNode) {
                 vehicle.move();
-                virtualMap.update(vehicle);
+                virtualMap.updateMovement(vehicle);
             } else if (leftNode == nextNodeToVisit) {
                 vehicle.turnLeft();
             } else if (rightNode == nextNodeToVisit) {
@@ -269,7 +269,7 @@ public class CyclicAlgorithm {
             } else {    //nextNode is empty, not a wall or a returnNode
                 if (setupVehicle.getDirection() == NORTH || setupVehicle.getDirection() == SOUTH) {
                     setupVehicle.move();
-                    virtualMap.update(setupVehicle);
+                    virtualMap.updateMovement(setupVehicle);
                 } else {  //vehicle is facing EAST or WEST
                     double currentTime = System.currentTimeMillis();
 
@@ -280,14 +280,14 @@ public class CyclicAlgorithm {
                             setupVehicle.turnRight();
                         } else {
                             setupVehicle.move();
-                            virtualMap.update(setupVehicle);
+                            virtualMap.updateMovement(setupVehicle);
                         }
                     } else if (rightNode.isWall() || rightNode.isReturnNode()) {
                         if ((currentTime - leftNode.lastVisited()) >= (currentTime - nextNode.lastVisited())) {
                             setupVehicle.turnLeft();
                         } else {
                             setupVehicle.move();
-                            virtualMap.update(setupVehicle);
+                            virtualMap.updateMovement(setupVehicle);
                         }
                     }
                 }

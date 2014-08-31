@@ -14,6 +14,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -31,10 +32,12 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private static LinkedList<Vehicle> vehicles = new LinkedList<Vehicle>();
     private static CyclicAlgorithm cyclicAlgorithm;
     private static NoncyclicAlgorithm noncyclicAlgorithm;
-    private AlgorithmThread algorithmThread = new AlgorithmThread();
-    private MonitorThread monitorThread = new MonitorThread();
-    private Thread thread1 = new Thread(algorithmThread);
-    private Thread thread2 = new Thread(monitorThread);
+    private AlgorithmThread algorithmThread;
+    private MonitorThread monitorThread;
+    private FireThread fireThread;
+    private Thread thread1;
+    private Thread thread2;
+    private Thread thread3;
     private int xDimension;
     private int yDimension;
     //private int avgTimeTaken;    //to measure the average time taken for a node to be visited
@@ -240,7 +243,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jTextField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField2.setText("");
         jTextField2.setEnabled(false);
-        jTextField2.setScrollOffset(0);
 
         jLabel10.setText("msec");
 
@@ -374,7 +376,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
         vehicles.clear();
         vehicles.add(new Vehicle(1, 1, 1, SOUTH));
         for (Vehicle vehicle : vehicles) {
-            virtualMap.update(vehicle);
+            virtualMap.updateMovement(vehicle);
         }
 
         //run algorithm thread
@@ -382,9 +384,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
         noncyclicAlgorithm = new NoncyclicAlgorithm(vehicles, virtualMap);
         algorithmThread.terminate(false);
         monitorThread.terminate(false);
+        fireThread.terminate(false);
         try {
             thread1.join(1);
             thread2.join(1);
+            thread3.join(1);
         } catch (InterruptedException ex) {
             Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -397,9 +401,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         algorithmThread.terminate(true);
         monitorThread.terminate(true);
+        fireThread.terminate(true);
         try {
             thread1.join(1);
             thread2.join(1);
+            thread3.join(1);
         } catch (InterruptedException ex) {
             Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -424,7 +430,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
         MapPanel.removeAll();
         MapPanel.setLayout(new java.awt.GridLayout(yDimension + 2, xDimension + 2));
-        virtualMap = new Map(xDimension + 2, yDimension + 2);
+        virtualMap = new Map(xDimension + 2, yDimension + 2, 1);
 
         for (int j = 0; j < virtualMap.getYDimension(); j++) {
             for (int i = 0; i < virtualMap.getXDimension(); i++) {
@@ -469,15 +475,21 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     private void initialize() {
         generateMap();
-        algorithmThread.terminate(true);
-        monitorThread.terminate(true);
+        algorithmThread = new AlgorithmThread();
+        monitorThread = new MonitorThread();
+        fireThread = new FireThread();
+        thread1 = new Thread(algorithmThread);
+        thread2 = new Thread(monitorThread);
+        thread3 = new Thread(fireThread);
+       
         thread1.start();
         thread2.start();
+        thread3.start();
     }
 
     public class MonitorThread implements Runnable {
 
-        private boolean terminate = false;
+        private boolean terminate = true;
         private int longestTimeTaken = 0;
         private int avgTimeTaken = 0;
 
@@ -505,7 +517,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         if (virtualMap.getNode(i, j).isVisited()) {
                             totalTimeTaken = totalTimeTaken + timeTaken;
                             counter++;
-                            if(this.longestTimeTaken<timeTaken) {
+                            if (this.longestTimeTaken < timeTaken) {
                                 this.longestTimeTaken = (int) timeTaken;
                                 jTextField2.setText(String.valueOf(this.longestTimeTaken));
                             }
@@ -524,13 +536,13 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     public class AlgorithmThread implements Runnable {
 
-        private boolean terminate = false;
+        private boolean terminate = true;
 
         public void run() {
             System.out.println("Running algorithm thread!");
 
             while (true) {
-                while (terminate) {
+                while (this.terminate) {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
@@ -539,10 +551,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 }
                 System.out.println("algorithm running");
                 updateGUI(virtualMap);
-                if(jComboBox1.getSelectedIndex() == 0)
+                if (jComboBox1.getSelectedIndex() == 0) {
                     cyclicAlgorithm.run();
-                else if (jComboBox1.getSelectedIndex() == 1)
+                } else if (jComboBox1.getSelectedIndex() == 1) {
                     noncyclicAlgorithm.run();
+                }
                 System.out.println("From GUI:");
                 virtualMap.printMap();
                 try {
@@ -560,29 +573,51 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     public class FireThread implements Runnable {
 
-        private boolean terminate = false;
+        private boolean terminate = true;
+        private Random randomGenerator = new Random();
 
+        @Override
         public void run() {
             while (true) {
                 while (terminate) {
                     try {
+                        //virtualMap.getNumberOfFire() = 0;   //reset
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                for (int j = 0; j < virtualMap.getYDimension(); j++) {
-                    for (int i = 0; i < virtualMap.getXDimension(); i++) {
-                        Node currNode = virtualMap.getNode(i, j);
-                        if ((!currNode.isOnFire()) && (!currNode.isOccupied())) {
-                            double timeGap = System.currentTimeMillis() - currNode.lastVisited();
+                if (virtualMap.getNumberOfFire() < 1) {
+                    for (int j = 0; j < virtualMap.getYDimension(); j++) {
+                        for (int i = 0; i < virtualMap.getXDimension(); i++) {
+                            Node currNode = virtualMap.getNode(i, j);
+                            System.out.println("here");
+                            if ((!currNode.isOnFire()) && (!currNode.isOccupied()) && (!currNode.isWall()) && (virtualMap.getNumberOfFire() < 1)) {
+                                double timeGap = System.currentTimeMillis() - currNode.lastVisited();
+                                double probability = randomGenerator.nextDouble() * function(timeGap / 1000);
+                                System.out.println(probability);
+                                if (probability >= currNode.getFireProbability()) {
+                                    currNode.setOnFire(true);
+                                    virtualMap.update();
+                                    //virtualMap.getNumberOfFire()++;
+                                }
+                            }
                         }
                     }
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
 
-        public void termiante(boolean terminate) {
+        private double function(double time) {
+            return ((1 - Math.exp(-time / 10)) / (1 + Math.exp(-time / 10)));
+        }
+
+        public void terminate(boolean terminate) {
             this.terminate = terminate;
         }
     }

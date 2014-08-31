@@ -94,7 +94,7 @@ public class NoncyclicAlgorithm {
                 if (vehicle.getDirection() == NORTH || vehicle.getDirection() == SOUTH) {
                     //vehicle is facing NORTH or SOUTH
                     vehicle.move();
-                    virtualMap.update(vehicle);
+                    virtualMap.updateMovement(vehicle);
                 } else {  //vehicle is facing EAST or WEST
                     //compare if NORTH or SOUTH node is high priority
                     double currentTime = System.currentTimeMillis();
@@ -105,7 +105,7 @@ public class NoncyclicAlgorithm {
                             vehicle.turnRight();
                         } else {
                             vehicle.move();
-                            virtualMap.update(vehicle);
+                            virtualMap.updateMovement(vehicle);
                         }
                     } else if (rightNode.isWall()) {
                         //compare the left node
@@ -114,7 +114,7 @@ public class NoncyclicAlgorithm {
                             vehicle.turnLeft();
                         } else {
                             vehicle.move();
-                            virtualMap.update(vehicle);
+                            virtualMap.updateMovement(vehicle);
                         }
                     }
                 }

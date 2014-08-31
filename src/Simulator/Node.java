@@ -22,21 +22,23 @@ public class Node {
     private boolean isOccupied;
     private boolean isReturnNode;
     private boolean isOnFire;
+    private boolean isHotspot;
     private double fireProbability; //the % of how fire-prone the node is
     private LinkedList<Vehicle> vehicles = new LinkedList<Vehicle>();   //each node may contain multiple vehicles (i.e. the starting node)
     
-    public Node(int x, int y, boolean isWall, boolean isOccupied, boolean isReturnPath) {
+    public Node(int x, int y, boolean isWall, double fireProbability) {
         this.x = x;
         this.y = y;
         this.isWall = isWall;
-        this.isOccupied = isOccupied;
-        this.isReturnNode = isReturnPath;
+        this.isOccupied = false;
+        this.isReturnNode = false;
         this.isVisited = false;
         this.lastVisited = System.currentTimeMillis();
         this.timeTaken = 0;
         this.isOnFire = false;
+        this.isHotspot = false;
         this.fireTimestamp = 0;
-        this.fireProbability = Math.random();
+        this.fireProbability = fireProbability;
     }
     
     public double lastVisited() {   //returns the timestamp of the node last visited by a vehicle
@@ -51,6 +53,22 @@ public class Node {
         return this.y;
     }
     
+    public void setHotspot(boolean hotspot) {
+        this.isHotspot = hotspot;
+    }
+    
+    public boolean isHotspot() {
+        return this.isHotspot;
+    }
+    
+    public void setFireProbability(double fireProbability) {
+        this.fireProbability = fireProbability;
+    }
+    
+    public double getFireProbability() {
+        return this.fireProbability;
+    }
+    
     public void setWall(boolean isWall) {
         this.isWall = isWall;
     }
@@ -59,25 +77,10 @@ public class Node {
         return this.isWall;
     }
     
-//    public void setOccupied(boolean isOccupied, Vehicle vehicle) {
-//        
-//        if(isOccupied) {
-//            this.vehicles.add(vehicle);
-//            this.isVisited = true;
-//        }
-//        else {
-//            //if(this.vehicles.contains(vehicle))
-//                this.vehicles.remove(vehicle);
-//        }
-//        
-//        this.isOccupied = isOccupied;
-//        
-//    }
-    
     public void add(Vehicle vehicle) {
         this.vehicles.add(vehicle);
         this.isVisited = true;
-        this.isOccupied = false;
+        this.isOccupied = true;
         timestamp();
     }
     
@@ -122,6 +125,9 @@ public class Node {
         if(!this.isOnFire) {
             this.isOnFire = true;
             this.fireTimestamp = System.currentTimeMillis();
+        }
+        else {
+            this.isOnFire=false;
         }
     }
     
