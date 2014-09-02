@@ -6,8 +6,6 @@
 
 package Simulator;
 
-import java.util.LinkedList;
-
 /**
  *
  * @author KSEET_000

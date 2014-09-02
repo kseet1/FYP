@@ -35,7 +35,7 @@ public class Map {
                     nodeMap[y][x] = newNode;
                 } else {
                     map[y][x] = 0;
-                    newNode = new Node(x, y, false, 0.1);
+                    newNode = new Node(x, y, false, 0.01);
                     nodeMap[y][x] = newNode;
                 }
                 nodeArrayList.add(newNode);
@@ -51,6 +51,8 @@ public class Map {
                 Node node = nodeArrayList.get(randomIndex);
                 node.setHotspot(true);
                 node.setFireProbability(0.2);
+                System.out.println("Hotspot at:");
+                node.printCoordinates();
                 currNumberOfHotspots++;
             }
         }
@@ -93,7 +95,7 @@ public class Map {
         //nodeMap[yCoordinate][xCoordinate].setOccupied(true,vehicle);
         nodeMap[prev_YCoordinate][prev_XCoordinate].remove(vehicle);
         nodeMap[yCoordinate][xCoordinate].add(vehicle);
-        if(nodeMap[yCoordinate][xCoordinate].isOnFire()) {
+        if (nodeMap[yCoordinate][xCoordinate].isOnFire()) {
             nodeMap[yCoordinate][xCoordinate].setOnFire(false);
             currNumberOfFire--;
         }
@@ -110,10 +112,20 @@ public class Map {
         return nodeMap[y][x];
     }
 
+    public Node getNode(int index) {
+        int i = index;
+        int y = 1;
+        int x = 1;
+        y = (index/(xDim-2))+1;
+        x = (index%(xDim-2))+1;
+        
+        return nodeMap[y][x];
+    }
+
     public int getNumberOfFire() {
         return this.currNumberOfFire;
     }
-    
+
     public int[][] getMap() {
         return this.map;
     }

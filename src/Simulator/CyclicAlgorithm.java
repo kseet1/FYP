@@ -26,17 +26,12 @@ public class CyclicAlgorithm {
     public CyclicAlgorithm(LinkedList<Vehicle> vehicles, Map current_map) {
         this.vehicles = vehicles;
         this.virtualMap = current_map;
-        //setReturnPath(1, 1);
-        //this.keyNode = virtualMap.getNode(virtualMap.getXDimension() - 2, 2);
         startNode = virtualMap.getNode(1, 1);
         setupCyclicPath();
     }
 
     public void run() {
 
-        //if (visitedNodes.size() == virtualMap.size()) {
-        //vehicle have traversed the entire map
-        //use the recorded traversed nodes as the path for the algorithm
         for (Vehicle vehicle : vehicles) {
             Node currNode = virtualMap.getNode(vehicle.getXCoordinate(), vehicle.getYCoordinate());
 
@@ -54,10 +49,10 @@ public class CyclicAlgorithm {
             Node leftNode;
             Node rightNode;
 
-            System.out.println("current node: ");
-            currNode.printCoordinates();
-            System.out.println("Next node to visit: ");
-            nextNodeToVisit.printCoordinates();
+//            System.out.println("current node: ");
+//            currNode.printCoordinates();
+//            System.out.println("Next node to visit: ");
+//            nextNodeToVisit.printCoordinates();
             switch (direction) {
                 case NORTH:
                     nextNode = virtualMap.getNode(xCoordinate, yCoordinate - 1);
@@ -94,104 +89,7 @@ public class CyclicAlgorithm {
             } else if (rightNode == nextNodeToVisit) {
                 vehicle.turnRight();
             }
-
         }
-
-//        } else {
-//
-//            if (this.keyNode.isOccupied()) {
-//                clearReturnPath(1, 1);
-//            }
-//
-//            for (Vehicle vehicle : vehicles) {
-//                int xCoordinate = vehicle.getXCoordinate();
-//                int yCoordinate = vehicle.getYCoordinate();
-//                int direction = vehicle.getDirection();
-//                Node currNode = virtualMap.getNode(xCoordinate, yCoordinate);
-//                Node leftNode;
-//                Node rightNode;
-//                Node nextNode;
-//
-//                if (!visitedNodes.contains(currNode)) {
-//                    visitedNodes.add(currNode);
-//                }
-//
-//                switch (direction) {
-//                    case NORTH:
-//                        nextNode = virtualMap.getNode(xCoordinate, yCoordinate - 1);
-//                        leftNode = virtualMap.getNode(xCoordinate - 1, yCoordinate);
-//                        rightNode = virtualMap.getNode(xCoordinate + 1, yCoordinate);
-//                        break;
-//                    case EAST:
-//                        nextNode = virtualMap.getNode(xCoordinate + 1, yCoordinate);
-//                        leftNode = virtualMap.getNode(xCoordinate, yCoordinate - 1);
-//                        rightNode = virtualMap.getNode(xCoordinate, yCoordinate + 1);
-//                        break;
-//                    case SOUTH:
-//                        nextNode = virtualMap.getNode(xCoordinate, yCoordinate + 1);
-//                        leftNode = virtualMap.getNode(xCoordinate + 1, yCoordinate);
-//                        rightNode = virtualMap.getNode(xCoordinate - 1, yCoordinate);
-//                        break;
-//                    case WEST:
-//                        nextNode = virtualMap.getNode(xCoordinate - 1, yCoordinate);
-//                        leftNode = virtualMap.getNode(xCoordinate, yCoordinate + 1);
-//                        rightNode = virtualMap.getNode(xCoordinate, yCoordinate - 1);
-//                        break;
-//                    default:
-//                        nextNode = null;
-//                        leftNode = null;
-//                        rightNode = null;
-//                        break;
-//                }
-//
-//                if (nextNode.isOccupied()) {
-//                    //for the bump and reverse algorithm - if the vehicle meets another vehicle, reverse direction
-//                    vehicle.reverseDirection();
-//                } else if (nextNode.isWall() || nextNode.isReturnNode()) {    //next node is a wall 
-//                    if (leftNode.isWall()) {
-//                        vehicle.turnRight();
-//                    } else if (rightNode.isWall()) {
-//                        vehicle.turnLeft();
-//                    } else {  //both left and right node is not a wall
-//                        //turn the vehicle's direction to the next highest priority node
-//                        //compare the last visited timestamp for each node
-//
-//                        double currentTime = System.currentTimeMillis();
-//
-//                        if ((currentTime - leftNode.lastVisited()) > (currentTime - rightNode.lastVisited())) {
-//                            vehicle.turnLeft();
-//                        } else {
-//                            vehicle.turnRight();
-//                        }
-//                    }
-//                } else {    //nextNode is empty, not a wall or a returnNode
-//                    if (vehicle.getDirection() == NORTH || vehicle.getDirection() == SOUTH) {
-//                        vehicle.move();
-//                        virtualMap.update(vehicle);
-//                    } else {  //vehicle is facing EAST or WEST
-//                        double currentTime = System.currentTimeMillis();
-//
-//                        //compare the priorities of nextNode with left and right nodes
-//                        //this is done by comparing the timestamps of the visits on each nodes
-//                        if (leftNode.isWall() || leftNode.isReturnNode()) {
-//                            if ((currentTime - rightNode.lastVisited()) >= (currentTime - nextNode.lastVisited())) {
-//                                vehicle.turnRight();
-//                            } else {
-//                                vehicle.move();
-//                                virtualMap.update(vehicle);
-//                            }
-//                        } else if (rightNode.isWall() || rightNode.isReturnNode()) {
-//                            if ((currentTime - leftNode.lastVisited()) >= (currentTime - nextNode.lastVisited())) {
-//                                vehicle.turnLeft();
-//                            } else {
-//                                vehicle.move();
-//                                virtualMap.update(vehicle);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     //a private method to setup the path of the cyclic algorithm
@@ -204,7 +102,7 @@ public class CyclicAlgorithm {
         setReturnPath(1, 1);
 
         do {
-            System.out.println("Setting up");
+            //System.out.println("Setting up");
             if (keyNode.isVisited()) {
                 clearReturnPath(1, 1);
             }
@@ -293,8 +191,9 @@ public class CyclicAlgorithm {
                 }
             }
             currNode = virtualMap.getNode(setupVehicle.getXCoordinate(), setupVehicle.getYCoordinate());
-            currNode.printCoordinates();
+            //currNode.printCoordinates();
         } while (currNode != startNode);
+        //remove setupVehicle
         virtualMap.getNode(1, 1).remove(setupVehicle);
     }
 

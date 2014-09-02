@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Level;
@@ -481,7 +482,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
         thread1 = new Thread(algorithmThread);
         thread2 = new Thread(monitorThread);
         thread3 = new Thread(fireThread);
-       
+
         thread1.start();
         thread2.start();
         thread3.start();
@@ -549,15 +550,15 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                System.out.println("algorithm running");
+                //System.out.println("algorithm running");
                 updateGUI(virtualMap);
                 if (jComboBox1.getSelectedIndex() == 0) {
                     cyclicAlgorithm.run();
                 } else if (jComboBox1.getSelectedIndex() == 1) {
                     noncyclicAlgorithm.run();
                 }
-                System.out.println("From GUI:");
-                virtualMap.printMap();
+                //System.out.println("From GUI:");
+                //virtualMap.printMap();
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
@@ -575,38 +576,69 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
         private boolean terminate = true;
         private Random randomGenerator = new Random();
+        private Node maxPrNode; //Node that have the highest probability of fire
+        private double maxProbability;
+        private double totalWeight = 0;
+        private ArrayList<Double> probabilities = new ArrayList<>();
 
         @Override
         public void run() {
             while (true) {
                 while (terminate) {
                     try {
-                        //virtualMap.getNumberOfFire() = 0;   //reset
+                        //reset
+                        totalWeight = 0;
+                        maxProbability = 0;
+                        maxPrNode = null;
+                        probabilities.clear();
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                totalWeight = 0;
+                maxPrNode = null;
+                maxProbability = 0;
+                probabilities.clear();
+
                 if (virtualMap.getNumberOfFire() < 1) {
                     for (int j = 0; j < virtualMap.getYDimension(); j++) {
                         for (int i = 0; i < virtualMap.getXDimension(); i++) {
                             Node currNode = virtualMap.getNode(i, j);
-                            System.out.println("here");
-                            if ((!currNode.isOnFire()) && (!currNode.isOccupied()) && (!currNode.isWall()) && (virtualMap.getNumberOfFire() < 1)) {
+                            if ((!currNode.isWall()) && (virtualMap.getNumberOfFire() < 1)) {
                                 double timeGap = System.currentTimeMillis() - currNode.lastVisited();
-                                double probability = randomGenerator.nextDouble() * function(timeGap / 1000);
+                                //double probability = function(timeGap / 1000) * currNode.getFireProbability();
+                                double probability = currNode.getFireProbability();
                                 System.out.println(probability);
-                                if (probability >= currNode.getFireProbability()) {
-                                    currNode.setOnFire(true);
-                                    virtualMap.update();
-                                    //virtualMap.getNumberOfFire()++;
-                                }
+                                totalWeight += probability;
+                                probabilities.add(probability);
                             }
                         }
                     }
+
+                    //based on roulette-selection algorithm
+                    System.out.println(totalWeight);
+                    double randomWeight = randomGenerator.nextDouble() * totalWeight;
+                    System.out.println(randomGenerator.nextDouble());
+                    //randomGenerator.n
+                    System.out.println(randomWeight);
+                    double sumOfWeight = 0;
+                    int index = 0;
+                    for (Double probability : probabilities) {
+                        sumOfWeight += probability;
+                        if (randomWeight < sumOfWeight) {
+                            break;
+                        } else {    //randomWeight >= sumOfWeight
+                            index++;
+                        }
+                    }
+                    virtualMap.getNode(index).setOnFire(true);
+                    virtualMap.update();
                 }
                 try {
-                    Thread.sleep(100);
+                    //sleep for a random amount of time
+                    Thread.sleep((long) (randomGenerator.nextDouble() * 10000));
+                    //Thread.sleep(100);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
