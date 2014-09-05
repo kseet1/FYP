@@ -17,6 +17,7 @@ public class Node {
     private double lastVisited;
     private double timeTaken; //the time taken between the two last visits
     private double fireTimestamp; //timestamp the moment the node caught fire
+    private double fireDiscoveryTime;   //time taken to discover the fire
     private boolean isVisited;
     private boolean isWall;
     private boolean isOccupied;
@@ -128,11 +129,18 @@ public class Node {
         }
         else {
             this.isOnFire=false;
+            this.fireDiscoveryTime = System.currentTimeMillis() - this.fireTimestamp;
         }
     }
     
     public boolean isOnFire() {
         return this.isOnFire;
+    }
+    
+    public double getFireDiscoveryTime() {
+        double discoveryTime = this.fireDiscoveryTime;
+        this.fireDiscoveryTime = 0; //reset the timer
+        return discoveryTime;
     }
     
     public void printCoordinates() {

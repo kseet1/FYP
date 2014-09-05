@@ -18,7 +18,7 @@ import static Simulator.Vehicle.WEST;
 public class CyclicAlgorithm {
 
     private LinkedList<Vehicle> vehicles;
-    private LinkedList<Node> visitedNodes = new LinkedList<Node>();
+    private LinkedList<Node> visitedNodes = new LinkedList<>();
     //private Node keyNode;
     private Node startNode;
     private Map virtualMap;
@@ -40,11 +40,20 @@ public class CyclicAlgorithm {
             int direction = vehicle.getDirection();
             int currNodeIndex = visitedNodes.indexOf(currNode);
             Node nextNodeToVisit;
-            if (currNode == visitedNodes.peekLast()) {
-                nextNodeToVisit = virtualMap.getNode(startNode.getX(), startNode.getY());
+            if (!vehicle.isReversed()) {
+                if (currNode == visitedNodes.peekLast()) {
+                    nextNodeToVisit = visitedNodes.peekFirst();
+                } else {
+                    nextNodeToVisit = visitedNodes.get(currNodeIndex + 1);
+                }
             } else {
-                nextNodeToVisit = visitedNodes.get(currNodeIndex + 1);
+                if (currNode == visitedNodes.peekFirst()) {
+                    nextNodeToVisit = visitedNodes.peekLast();
+                } else {
+                    nextNodeToVisit = visitedNodes.get(currNodeIndex - 1);
+                }
             }
+
             Node nextNode;
             Node leftNode;
             Node rightNode;
@@ -81,13 +90,20 @@ public class CyclicAlgorithm {
                     break;
             }
 
-            if (nextNodeToVisit == nextNode) {
-                vehicle.move();
-                virtualMap.updateMovement(vehicle);
-            } else if (leftNode == nextNodeToVisit) {
-                vehicle.turnLeft();
-            } else if (rightNode == nextNodeToVisit) {
-                vehicle.turnRight();
+            if (nextNodeToVisit.isOccupied()) {
+                vehicle.reverseDirection();
+                if (currNode == visitedNodes.peekFirst()) {
+                    vehicle.setDirection(EAST);
+                }
+            } else {
+                if (nextNodeToVisit == nextNode) {
+                    vehicle.move();
+                    virtualMap.updateMovement(vehicle);
+                } else if (leftNode == nextNodeToVisit) {
+                    vehicle.turnLeft();
+                } else if (rightNode == nextNodeToVisit) {
+                    vehicle.turnRight();
+                }
             }
         }
     }

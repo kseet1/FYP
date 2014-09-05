@@ -25,6 +25,7 @@ public class Map {
         Node newNode;
         xDim = xDimension;
         yDim = yDimension;
+        currNumberOfFire = 0;
         ArrayList<Node> nodeArrayList = new ArrayList<>();
 
         for (int x = 0; x < xDim; x++) {
@@ -57,14 +58,10 @@ public class Map {
             }
         }
 
-        for (int[] row : map) {
-            for (int node : row) {
-                System.out.print(node);
-            }
-            System.out.println();
-        }
+        printMap();
     }
 
+    //Update the entire map based iterating through the entire nodeMap.
     public void update() {
         currNumberOfFire = 0;
         for (int x = 0; x < xDim; x++) {
@@ -83,6 +80,7 @@ public class Map {
         }
     }
 
+    //Similar to update(), but updates only the two concerned nodes.
     public void updateMovement(Vehicle vehicle) {
         int xCoordinate = vehicle.getXCoordinate();
         int yCoordinate = vehicle.getYCoordinate();
