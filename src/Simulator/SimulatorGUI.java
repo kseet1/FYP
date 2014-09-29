@@ -13,15 +13,24 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JSpinner;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -30,7 +39,8 @@ import javax.swing.JSpinner;
 public class SimulatorGUI extends javax.swing.JFrame {
 
     private static Map virtualMap;
-    private static LinkedList<Vehicle> vehicles = new LinkedList<Vehicle>();
+    private static LinkedList<Vehicle> vehicles = new LinkedList<>();
+    private static LinkedList<Color> colors = new LinkedList<>(Arrays.asList(Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.YELLOW));
     private static CyclicAlgorithm cyclicAlgorithm;
     private static NoncyclicAlgorithm noncyclicAlgorithm;
     private AlgorithmThread algorithmThread;
@@ -49,8 +59,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
     /**
      * Creates new form SimulatorGUI
      */
+    DefaultTableModel model;
+
     public SimulatorGUI() {
         initComponents();
+        model = (DefaultTableModel) vehicleTable.getModel();
     }
 
     /**
@@ -70,15 +83,27 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jButtonGenerateMap = new javax.swing.JButton();
-        jSpinner2 = new javax.swing.JSpinner();
-        jSpinner3 = new javax.swing.JSpinner();
+        jSpinnerXDim = new javax.swing.JSpinner();
+        jSpinnerYDim = new javax.swing.JSpinner();
         jPanel1 = new javax.swing.JPanel();
         jComboBox1 = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
-        jButton2 = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        vehicleTable = new javax.swing.JTable() {
+            public Component prepareRenderer(TableCellRenderer r, int rw, int col) {
+                Component c = super.prepareRenderer(r, rw, col);
+                c.setBackground(Color.WHITE);
+                if(col==2) {
+                    c.setBackground(vehicles.get(rw).getColor());
+                }
+                return c;
+            }
+        };
+        jButtonEditSpeed = new javax.swing.JButton();
+        jButtonRemoveVehicle = new javax.swing.JButton();
+        jButtonAddVehicle = new javax.swing.JButton();
+        jButtonRunAlgorithm = new javax.swing.JButton();
+        jButtonStopAlgorithm = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -99,7 +124,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jTextField6 = new javax.swing.JTextField();
         jPanel5 = new javax.swing.JPanel();
         jLabel13 = new javax.swing.JLabel();
-        jSpinner4 = new javax.swing.JSpinner();
+        jSpinnerHotspots = new javax.swing.JSpinner();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -131,11 +156,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
             }
         });
 
-        jSpinner2.setModel(new javax.swing.SpinnerNumberModel(4, 4, 100, 2));
-        ((JSpinner.DefaultEditor)jSpinner2.getEditor()).getTextField().setEditable(false);
+        jSpinnerXDim.setModel(new javax.swing.SpinnerNumberModel(4, 4, 100, 2));
+        ((JSpinner.DefaultEditor)jSpinnerXDim.getEditor()).getTextField().setEditable(false);
 
-        jSpinner3.setModel(new javax.swing.SpinnerNumberModel(4, 4, 100, 2));
-        ((JSpinner.DefaultEditor)jSpinner3.getEditor()).getTextField().setEditable(false);
+        jSpinnerYDim.setModel(new javax.swing.SpinnerNumberModel(4, 4, 100, 2));
+        ((JSpinner.DefaultEditor)jSpinnerYDim.getEditor()).getTextField().setEditable(false);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -149,17 +174,17 @@ public class SimulatorGUI extends javax.swing.JFrame {
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSpinner2, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE))
+                                .addComponent(jSpinnerXDim, javax.swing.GroupLayout.DEFAULT_SIZE, 89, Short.MAX_VALUE))
                             .addGroup(jPanel3Layout.createSequentialGroup()
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSpinner3)))
+                                .addComponent(jSpinnerYDim)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4)))
                     .addComponent(jButtonGenerateMap))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(180, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -168,11 +193,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(jLabel3)
-                    .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSpinnerXDim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jSpinnerYDim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel4))
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
@@ -191,9 +216,45 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
         jLabel5.setText("Optimization Algorithm:");
 
-        jLabel6.setText("Number of Vehicles:");
+        vehicleTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(1, 1, 10, 1));
+            },
+            new String [] {
+                "Vehicle Number", "Speed", "Colour"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        vehicleTable.setSelectionForeground(new java.awt.Color(0, 0, 0));
+        jScrollPane1.setViewportView(vehicleTable);
+
+        jButtonEditSpeed.setText("Edit Speed");
+        jButtonEditSpeed.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonEditSpeedActionPerformed(evt);
+            }
+        });
+
+        jButtonRemoveVehicle.setText("Remove Vehicle");
+        jButtonRemoveVehicle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonRemoveVehicleActionPerformed(evt);
+            }
+        });
+
+        jButtonAddVehicle.setText("Add Vehicle");
+        jButtonAddVehicle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonAddVehicleActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -202,13 +263,18 @@ public class SimulatorGUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel6))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(150, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 324, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jButtonAddVehicle)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonRemoveVehicle)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButtonEditSpeed)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -217,24 +283,26 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(32, 32, 32)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(jSpinner1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButtonEditSpeed)
+                    .addComponent(jButtonRemoveVehicle)
+                    .addComponent(jButtonAddVehicle))
+                .addGap(9, 9, 9)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
-        jButton2.setText("Run Algorithm");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        jButtonRunAlgorithm.setText("Run Algorithm");
+        jButtonRunAlgorithm.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                jButtonRunAlgorithmActionPerformed(evt);
             }
         });
 
-        jButton1.setText("Stop Algorithm");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonStopAlgorithm.setText("Stop Algorithm");
+        jButtonStopAlgorithm.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonStopAlgorithmActionPerformed(evt);
             }
         });
 
@@ -376,7 +444,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
         jLabel13.setText("No. of Hotspots:");
 
-        jSpinner4.setModel(new javax.swing.SpinnerNumberModel(1, 0, 1, 1));
+        jSpinnerHotspots.setModel(new javax.swing.SpinnerNumberModel(1, 0, 5, 1));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -386,8 +454,8 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jSpinnerHotspots, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -395,7 +463,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
-                    .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSpinnerHotspots, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -403,21 +471,21 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jButtonRunAlgorithm)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonStopAlgorithm))
+                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -427,14 +495,13 @@ public class SimulatorGUI extends javax.swing.JFrame {
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(jButton1))
+                    .addComponent(jButtonRunAlgorithm)
+                    .addComponent(jButtonStopAlgorithm))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(96, 96, 96))
+                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jMenu1.setText("File");
@@ -461,9 +528,9 @@ public class SimulatorGUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(MapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 595, Short.MAX_VALUE)
+                .addComponent(MapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -471,9 +538,8 @@ public class SimulatorGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(MapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 725, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(MapPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         pack();
@@ -484,47 +550,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void jButtonGenerateMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGenerateMapActionPerformed
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         // TODO add your handling code here:
-        generateMap();
-    }//GEN-LAST:event_jButtonGenerateMapActionPerformed
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        generateMap();
-        //instantiate vehicle objects
-        //for now, just instantiate one vehicle
-        vehicles.clear();
-        for (int i=0; i<(int) jSpinner1.getValue(); i++) {
-            vehicles.add(new Vehicle(1, 1, 1, SOUTH));
-        }
-        for (Vehicle vehicle : vehicles) {
-            virtualMap.updateMovement(vehicle);
-        }
-
-        //reset the textfields that are displaying performance
-        resetTextFields();
-        
-        //run algorithm thread
-        cyclicAlgorithm = new CyclicAlgorithm(vehicles, virtualMap);
-        noncyclicAlgorithm = new NoncyclicAlgorithm(vehicles, virtualMap);
-        algorithmThread.terminate(false);
-        monitorThread.terminate(false);
-        fireThread.terminate(false);
-        try {
-            thread1.join(1);
-            thread2.join(1);
-            thread3.join(1);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        jButtonGenerateMap.setEnabled(false);
-        jButton2.setEnabled(false);
-        jComboBox1.setEnabled(false);
-
-    }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonStopAlgorithmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopAlgorithmActionPerformed
         algorithmThread.terminate(true);
         monitorThread.terminate(true);
         fireThread.terminate(true);
@@ -536,27 +566,135 @@ public class SimulatorGUI extends javax.swing.JFrame {
             Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         jButtonGenerateMap.setEnabled(true);
-        jButton2.setEnabled(true);
+        jButtonRunAlgorithm.setEnabled(true);
         jComboBox1.setEnabled(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButtonStopAlgorithmActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void jButtonRunAlgorithmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRunAlgorithmActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+        generateMap();
+        //instantiate vehicle objects
+        resetVehicles();
+        for (Vehicle vehicle : vehicles) {
+            virtualMap.updateMovement(vehicle);
+        }
+
+        //reset the textfields that are displaying performance
+        resetTextFields();
+
+        //reset the algorithm
+        cyclicAlgorithm = null;
+        noncyclicAlgorithm = null;
+
+        if (jComboBox1.getSelectedIndex() == 0) {
+            cyclicAlgorithm = new CyclicAlgorithm(vehicles, virtualMap);
+        }
+        if (jComboBox1.getSelectedIndex() == 1) {
+            noncyclicAlgorithm = new NoncyclicAlgorithm(vehicles, virtualMap);
+        }
+
+        //run algorithm, monitor, fire threads
+        algorithmThread.terminate(false);
+        monitorThread.terminate(false);
+        fireThread.terminate(false);
+        try {
+            thread1.join(1);
+            thread2.join(1);
+            thread3.join(1);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        jButtonGenerateMap.setEnabled(false);
+        jButtonRunAlgorithm.setEnabled(false);
+        jComboBox1.setEnabled(false);
+    }//GEN-LAST:event_jButtonRunAlgorithmActionPerformed
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
+    private void jButtonGenerateMapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGenerateMapActionPerformed
+        // TODO add your handling code here:
+        generateMap();
+    }//GEN-LAST:event_jButtonGenerateMapActionPerformed
+
+    private void jButtonEditSpeedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonEditSpeedActionPerformed
+        // TODO add your handling code here:
+        //JOptionPane.showInputDialog("Enter your name");
+        JOptionPane optionPane = new JOptionPane();
+        JSlider slider = getSlider(optionPane);
+        optionPane.setMessage(new Object[]{"Select a value: ", slider});
+        optionPane.setMessageType(JOptionPane.QUESTION_MESSAGE);
+        //optionPane.setOptionType(JOptionPane.OK_OPTION);
+        JDialog dialog = optionPane.createDialog(this, "Edit Vehicle Speed");
+        dialog.setVisible(true);
+        //save the edited speed to the selected vehicle
+        try {
+            model.setValueAt(optionPane.getInputValue(), vehicleTable.getSelectedRow(), 1);
+            vehicles.get(vehicleTable.getSelectedRow()).setSpeed((int) optionPane.getInputValue());
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }//GEN-LAST:event_jButtonEditSpeedActionPerformed
+
+    private void jButtonAddVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddVehicleActionPerformed
+        // TODO add your handling code here:
+        vehicles.add(new Vehicle(1, 1, 1, SOUTH, getColor()));
+        //update the table
+        model.setRowCount(0);
+        for (int i = 0; i < vehicles.size(); i++) {
+            model.insertRow(model.getRowCount(), new Object[]{i + 1, vehicles.get(i).getSpeed(), ""});
+        }
+    }//GEN-LAST:event_jButtonAddVehicleActionPerformed
+
+    private void jButtonRemoveVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRemoveVehicleActionPerformed
+        // TODO add your handling code here:
+        try {
+            Vehicle vehicle = vehicles.get(vehicleTable.getSelectedRow());
+            vehicles.remove(vehicleTable.getSelectedRow());
+            model.removeRow(vehicleTable.getSelectedRow());
+            //update the table
+            model.setRowCount(0);
+            for (int i = 0; i < vehicles.size(); i++) {
+                model.insertRow(model.getRowCount(), new Object[]{i + 1, vehicles.get(i).getSpeed(), ""});
+            }
+            virtualMap.removeVehicle(vehicle);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }//GEN-LAST:event_jButtonRemoveVehicleActionPerformed
+
+    private JSlider getSlider(final JOptionPane optionPane) {
+        JSlider slider = new JSlider();
+        slider.setMajorTickSpacing(1);
+        slider.setMaximum(5);
+        slider.setMinimum(1);
+        slider.setValue(1);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        optionPane.setInputValue(new Integer(1));
+        ChangeListener changeListener = new ChangeListener() {
+            public void stateChanged(ChangeEvent changeEvent) {
+                JSlider theSlider = (JSlider) changeEvent.getSource();
+                if (!theSlider.getValueIsAdjusting()) {
+                    optionPane.setInputValue(new Integer(theSlider.getValue()));
+                }
+            }
+        };
+        slider.addChangeListener(changeListener);
+        return slider;
+    }
+
     private void generateMap() {
-        this.xDimension = (int) jSpinner2.getValue();
-        this.yDimension = (int) jSpinner3.getValue();
+        this.xDimension = (int) jSpinnerXDim.getValue();
+        this.yDimension = (int) jSpinnerYDim.getValue();
         System.out.println("xAxis: " + xDimension);
         System.out.println("yAxis: " + yDimension);
 
         MapPanel.removeAll();
         MapPanel.setLayout(new java.awt.GridLayout(yDimension + 2, xDimension + 2));
-        virtualMap = new Map(xDimension + 2, yDimension + 2, (int) jSpinner4.getValue());
+        virtualMap = new Map(xDimension + 2, yDimension + 2, (int) jSpinnerHotspots.getValue());
 
         for (int j = 0; j < virtualMap.getYDimension(); j++) {
             for (int i = 0; i < virtualMap.getXDimension(); i++) {
@@ -585,20 +723,48 @@ public class SimulatorGUI extends javax.swing.JFrame {
         }
     }
 
-    private void colorGrid(int x, int y, Component grid) {
-        int tmpMap[][] = virtualMap.getMap();
+    private Color getColor() {
 
-        if (tmpMap[y][x] == 0) {
+        boolean notUsed = false;    //flag to check if color is used by any vehicle
+        
+        for (Color color : colors) {
+            notUsed = false;
+            for (Vehicle vehicle : vehicles) {
+                if (vehicle.getColor() == color) {
+                    notUsed = true;
+                    break;  //break loop and check next color
+                }
+            }
+            if (notUsed == false)
+                return color;
+        }
+        return null;
+    }
+
+    private void colorGrid(int x, int y, Component grid) {
+        Node node = virtualMap.getNode(x, y);
+
+        if (!node.isOccupied() && !node.isWall() && !node.isOnFire()) {    //empty node
             grid.setBackground(Color.LIGHT_GRAY);
-        } else if (tmpMap[y][x] == 1) {
+        } else if (node.isWall()) { //wall
             grid.setBackground(Color.DARK_GRAY);
-        } else if (tmpMap[y][x] == 2) {
-            grid.setBackground(Color.BLUE);
-        } else if (tmpMap[y][x] == 3) {
+        } else if (node.isOccupied()) { //vehicle
+            LinkedList<Vehicle> tmpList = node.getVehicles();
+            //int index = vehicles.indexOf(tmpList.getFirst());
+            Vehicle vehicle = tmpList.getFirst();
+            grid.setBackground(vehicle.getColor());
+
+        } else if (node.isOnFire()) { //fire
             grid.setBackground(Color.RED);
         }
     }
-    
+
+    private void resetVehicles() {
+        for (Vehicle vehicle : vehicles) {
+            vehicle.resetPosition();
+        }
+    }
+
     private void resetTextFields() {
         jTextField1.setText("0.0");
         jTextField2.setText("0.0");
@@ -607,7 +773,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jTextField5.setText("0.0");
         jTextField6.setText("0");
     }
-    
+
     private void initialize() {
         generateMap();
         algorithmThread = new AlgorithmThread();
@@ -650,7 +816,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
                 for (int j = 0; j < virtualMap.getYDimension(); j++) {
                     for (int i = 0; i < virtualMap.getXDimension(); i++) {
                         if (virtualMap.getNumberOfFire() < 1) {
@@ -671,7 +837,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                                 jTextField6.setText(String.valueOf(discoveryTimes.size()));
                             }
                         }
-                        
+
                         double timeTaken = virtualMap.getNode(i, j).timeTaken();
                         if (virtualMap.getNode(i, j).isVisited()) {
                             totalTimeTaken = totalTimeTaken + timeTaken;
@@ -683,7 +849,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         }
                     }
                 }
-                this.avgTimeTaken = (int) (totalTimeTaken / counter); 
+                this.avgTimeTaken = (int) (totalTimeTaken / counter);
                 jTextField1.setText(String.valueOf(this.avgTimeTaken));
             }
         }
@@ -708,15 +874,12 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                //System.out.println("algorithm running");
                 updateGUI(virtualMap);
                 if (jComboBox1.getSelectedIndex() == 0) {
                     cyclicAlgorithm.run();
                 } else if (jComboBox1.getSelectedIndex() == 1) {
                     noncyclicAlgorithm.run();
                 }
-                //System.out.println("From GUI:");
-                //virtualMap.printMap();
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
@@ -733,7 +896,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
     public class FireThread implements Runnable {
 
         private boolean terminate = true;
-        private Random randomGenerator = new Random();
+        private final Random randomGenerator = new Random();
         private double totalWeight = 0;
         private ArrayList<Double> probabilities = new ArrayList<>();
 
@@ -782,6 +945,8 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         }
                     }
                     virtualMap.getNode(index).setOnFire(true);
+                    System.out.println("Node on fire:");
+                    System.out.println("x: " + virtualMap.getNode(index).getX() + " y: " + virtualMap.getNode(index).getY());
                     virtualMap.update();
                 }
                 try {
@@ -842,9 +1007,12 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MapPanel;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButtonAddVehicle;
+    private javax.swing.JButton jButtonEditSpeed;
     private javax.swing.JButton jButtonGenerateMap;
+    private javax.swing.JButton jButtonRemoveVehicle;
+    private javax.swing.JButton jButtonRunAlgorithm;
+    private javax.swing.JButton jButtonStopAlgorithm;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -860,7 +1028,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -873,15 +1040,16 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
-    private javax.swing.JSpinner jSpinner3;
-    private javax.swing.JSpinner jSpinner4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSpinner jSpinnerHotspots;
+    private javax.swing.JSpinner jSpinnerXDim;
+    private javax.swing.JSpinner jSpinnerYDim;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
+    private javax.swing.JTable vehicleTable;
     // End of variables declaration//GEN-END:variables
 }

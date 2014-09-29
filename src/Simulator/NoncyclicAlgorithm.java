@@ -9,6 +9,7 @@ import static Simulator.Vehicle.NORTH;
 import static Simulator.Vehicle.SOUTH;
 import static Simulator.Vehicle.EAST;
 import static Simulator.Vehicle.WEST;
+import java.awt.Color;
 import java.util.LinkedList;
 
 /**
@@ -28,7 +29,7 @@ public class NoncyclicAlgorithm {
     }
 
     public void run() {
-
+        
         for (Vehicle vehicle : vehicles) {
             Node currNode = virtualMap.getNode(vehicle.getXCoordinate(), vehicle.getYCoordinate());
 
@@ -107,7 +108,7 @@ public class NoncyclicAlgorithm {
 
     private void setupNoncyclicPath() {
 
-        Vehicle setupVehicle = new Vehicle(1, 1, 1, SOUTH);
+        Vehicle setupVehicle = new Vehicle(1, 1, 1, SOUTH, Color.BLUE);
         Node currNode;
         Node startNode = virtualMap.getNode(1, 1);
 
@@ -199,6 +200,7 @@ public class NoncyclicAlgorithm {
                 }
             }
             //virtualMap.printMap();
+            //currNode.printCoordinates();
             currNode = virtualMap.getNode(setupVehicle.getXCoordinate(), setupVehicle.getYCoordinate());
         } while (currNode != startNode);
         virtualMap.getNode(1, 1).remove(setupVehicle);

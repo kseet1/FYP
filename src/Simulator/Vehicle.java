@@ -5,6 +5,8 @@
  */
 package Simulator;
 
+import java.awt.Color;
+
 /**
  *
  * @author KSEET_000
@@ -23,9 +25,10 @@ public class Vehicle {
     private int direction; //direction of the vehicle facing
     private int reverse_direction; //store the previous direction the vehicle was facing
     private boolean isReversed; //a boolean flag to indicate whether it is on reverse mode.
-    private final int speed; //Speed of vehicle (variable performance between different vehicles)
+    private int speed; //Speed of vehicle (variable performance between different vehicles)
+    private final Color color;
 
-    public Vehicle(int x, int y, int speed, int direction) {
+    public Vehicle(int x, int y, int speed, int direction, Color color) {
         //initiate the starting point of the Vehicle
         this.curr_x = x;
         this.curr_y = y;
@@ -34,6 +37,7 @@ public class Vehicle {
         this.speed = speed;
         this.direction = direction;
         this.isReversed = false;
+        this.color = color;
     }
 
     public void move() {
@@ -101,6 +105,23 @@ public class Vehicle {
         this.direction = new_direction;
     }
 
+    public void resetPosition() {
+        this.curr_x = 1;
+        this.curr_y = 1;
+        this.prev_x = 1;
+        this.prev_y = 1;
+        this.isReversed = false;
+        this.direction = SOUTH;
+    }
+    
+    public void setXCoordinate(int x) {
+        this.curr_x = x;
+    }
+    
+    public void setYCoordinate(int y) {
+        this.curr_y = y;
+    }
+    
     public int getXCoordinate() {
         return this.curr_x;
     }
@@ -120,7 +141,19 @@ public class Vehicle {
     public int getDirection() {
         return this.direction;
     }
+    
+    public int getSpeed() {
+        return this.speed;
+    }
 
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
+    
+    public Color getColor() {
+        return this.color;
+    }
+    
     public boolean isReversed() {
         return this.isReversed;
     }

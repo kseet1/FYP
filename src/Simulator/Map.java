@@ -80,6 +80,14 @@ public class Map {
         }
     }
 
+    //Remove vehilce from the map
+    public void removeVehicle(Vehicle vehicle) {
+        int xCoordinate = vehicle.getXCoordinate();
+        int yCoordinate = vehicle.getYCoordinate();
+        
+        nodeMap[yCoordinate][xCoordinate].remove(vehicle);
+    }
+    
     //Similar to update(), but updates only the two concerned nodes.
     public void updateMovement(Vehicle vehicle) {
         int xCoordinate = vehicle.getXCoordinate();
@@ -87,10 +95,6 @@ public class Map {
         int prev_XCoordinate = vehicle.getPrevXCoordinate();
         int prev_YCoordinate = vehicle.getPrevYCoordinate();
 
-        //map[prev_YCoordinate][prev_XCoordinate] = 0;
-        //map[yCoordinate][xCoordinate] = 2;  //2 represents a vehicle in that node
-        //nodeMap[prev_YCoordinate][prev_XCoordinate].setOccupied(false,vehicle);
-        //nodeMap[yCoordinate][xCoordinate].setOccupied(true,vehicle);
         nodeMap[prev_YCoordinate][prev_XCoordinate].remove(vehicle);
         nodeMap[yCoordinate][xCoordinate].add(vehicle);
         if (nodeMap[yCoordinate][xCoordinate].isOnFire()) {
@@ -112,10 +116,9 @@ public class Map {
 
     public Node getNode(int index) {
         int i = index;
-        int y = 1;
-        int x = 1;
-        y = (index/(xDim-2))+1;
-        x = (index%(xDim-2))+1;
+        
+        int y = (index/(xDim-2))+1;
+        int x = (index%(xDim-2))+1;
         
         return nodeMap[y][x];
     }
@@ -157,6 +160,10 @@ public class Map {
 
     public int size() {
         return (this.xDim - 2) * (this.yDim - 2);
+    }
+    
+    public void readMap() {
+        //reads a txt file and generate the map
     }
 
 }
