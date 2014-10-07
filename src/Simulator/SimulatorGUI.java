@@ -105,12 +105,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jButtonRunAlgorithm = new javax.swing.JButton();
         jButtonStopAlgorithm = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
@@ -156,10 +150,10 @@ public class SimulatorGUI extends javax.swing.JFrame {
             }
         });
 
-        jSpinnerXDim.setModel(new javax.swing.SpinnerNumberModel(4, 4, 100, 2));
+        jSpinnerXDim.setModel(new javax.swing.SpinnerNumberModel(10, 4, 100, 2));
         ((JSpinner.DefaultEditor)jSpinnerXDim.getEditor()).getTextField().setEditable(false);
 
-        jSpinnerYDim.setModel(new javax.swing.SpinnerNumberModel(4, 4, 100, 2));
+        jSpinnerYDim.setModel(new javax.swing.SpinnerNumberModel(10, 4, 100, 2));
         ((JSpinner.DefaultEditor)jSpinnerYDim.getEditor()).getTextField().setEditable(false);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
@@ -308,27 +302,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Performance"));
 
-        jLabel7.setText("Average Time Taken: ");
-
-        jTextField1.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextField1.setText("");
-        jTextField1.setEnabled(false);
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        jLabel8.setText("msec");
-
-        jLabel9.setText("Longest Time Taken:");
-
-        jTextField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextField2.setText("");
-        jTextField2.setEnabled(false);
-
-        jLabel10.setText("msec");
-
         jLabel11.setText("Avg. Time Taken to Discover Fire:");
 
         jTextField3.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
@@ -367,20 +340,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel8))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel10))))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel11)
                             .addComponent(jLabel14)
@@ -403,22 +362,12 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         .addComponent(jLabel18)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(283, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(jLabel10)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
                     .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -437,7 +386,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
                     .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(63, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Hotspots"));
@@ -550,10 +499,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
-
     private void jButtonStopAlgorithmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStopAlgorithmActionPerformed
         algorithmThread.terminate(true);
         monitorThread.terminate(true);
@@ -639,11 +584,13 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     private void jButtonAddVehicleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAddVehicleActionPerformed
         // TODO add your handling code here:
-        vehicles.add(new Vehicle(1, 1, 1, SOUTH, getColor()));
-        //update the table
-        model.setRowCount(0);
-        for (int i = 0; i < vehicles.size(); i++) {
-            model.insertRow(model.getRowCount(), new Object[]{i + 1, vehicles.get(i).getSpeed(), ""});
+        if (vehicles.size() < 7) {
+            vehicles.add(new Vehicle(1, 1, 1, SOUTH, getColor()));
+            //update the table
+            model.setRowCount(0);
+            for (int i = 0; i < vehicles.size(); i++) {
+                model.insertRow(model.getRowCount(), new Object[]{i + 1, vehicles.get(i).getSpeed(), ""});
+            }
         }
     }//GEN-LAST:event_jButtonAddVehicleActionPerformed
 
@@ -766,8 +713,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
     }
 
     private void resetTextFields() {
-        jTextField1.setText("0.0");
-        jTextField2.setText("0.0");
         jTextField3.setText("0.0");
         jTextField4.setText("0.0");
         jTextField5.setText("0.0");
@@ -837,20 +782,8 @@ public class SimulatorGUI extends javax.swing.JFrame {
                                 jTextField6.setText(String.valueOf(discoveryTimes.size()));
                             }
                         }
-
-                        double timeTaken = virtualMap.getNode(i, j).timeTaken();
-                        if (virtualMap.getNode(i, j).isVisited()) {
-                            totalTimeTaken = totalTimeTaken + timeTaken;
-                            counter++;
-                            if (this.longestTimeTaken < timeTaken) {
-                                this.longestTimeTaken = (int) timeTaken;
-                                jTextField2.setText(String.valueOf(this.longestTimeTaken));
-                            }
-                        }
                     }
                 }
-                this.avgTimeTaken = (int) (totalTimeTaken / counter);
-                jTextField1.setText(String.valueOf(this.avgTimeTaken));
             }
         }
 
@@ -1015,7 +948,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private javax.swing.JButton jButtonStopAlgorithm;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
@@ -1028,9 +960,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -1044,8 +973,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private javax.swing.JSpinner jSpinnerHotspots;
     private javax.swing.JSpinner jSpinnerXDim;
     private javax.swing.JSpinner jSpinnerYDim;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;

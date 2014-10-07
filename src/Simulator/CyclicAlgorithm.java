@@ -32,7 +32,7 @@ public class CyclicAlgorithm {
     }
 
     public void run() {
-        
+
         for (Vehicle vehicle : vehicles) {
             int turns = vehicle.getSpeed(); //the vehicle speed determines the number of turns it has to move.
             while (turns != 0) {
@@ -41,22 +41,8 @@ public class CyclicAlgorithm {
                 int xCoordinate = vehicle.getXCoordinate();
                 int yCoordinate = vehicle.getYCoordinate();
                 int direction = vehicle.getDirection();
-                int currNodeIndex = visitedNodes.indexOf(currNode);
-                Node nextNodeToVisit;
-                if (!vehicle.isReversed()) {
-                    if (currNode == visitedNodes.peekLast()) {
-                        nextNodeToVisit = visitedNodes.peekFirst();
-                    } else {
-                        nextNodeToVisit = visitedNodes.get(currNodeIndex + 1);
-                    }
-                } else {
-                    if (currNode == visitedNodes.peekFirst()) {
-                        nextNodeToVisit = visitedNodes.peekLast();
-                    } else {
-                        nextNodeToVisit = visitedNodes.get(currNodeIndex - 1);
-                    }
-                }
-
+                Node nextNodeToVisit = getNextNode(vehicle, currNode);
+                
                 Node nextNode;
                 Node leftNode;
                 Node rightNode;
@@ -98,6 +84,12 @@ public class CyclicAlgorithm {
                     if (currNode == visitedNodes.peekFirst()) {
                         vehicle.setDirection(EAST);
                     }
+                    // reverse the direction of the other vehicle as well
+                    // reverse the direction if and only if that vehicle is facing the current vehicle
+                    Vehicle tmp = nextNodeToVisit.getVehicles().peekFirst();
+                    if (currNode == getNextNode(tmp, virtualMap.getNode(tmp.getXCoordinate(), tmp.getYCoordinate()))) {
+                        tmp.reverseDirection();
+                    }
                 } else {
                     if (nextNodeToVisit == nextNode) {
                         vehicle.move();
@@ -113,7 +105,7 @@ public class CyclicAlgorithm {
         }
     }
 
-    //a private method to setup the path of the cyclic algorithm
+    //a private method to setup the path of the cyclic algorithm (forming a hamiltonian path)
     private void setupCyclicPath() {
 
         Vehicle setupVehicle = new Vehicle(1, 1, 1, SOUTH, Color.BLUE);
@@ -231,5 +223,21 @@ public class CyclicAlgorithm {
         for (int i = startX; i < virtualMap.getXDimension() - 2; i++) {
             virtualMap.getNode(i, startY).setReturnNode(false);
         }
+    }
+    
+    private Node getNextNode(Vehicle vehicle, Node currNode) {
+         if (!vehicle.isReversed()) {
+                    if (currNode == visitedNodes.peekLast()) {
+                        return visitedNodes.peekFirst();
+                    } else {
+                        return visitedNodes.get(visitedNodes.indexOf(currNode) + 1);
+                    }
+                } else {
+                    if (currNode == visitedNodes.peekFirst()) {
+                        return visitedNodes.peekLast();
+                    } else {
+                        return visitedNodes.get(visitedNodes.indexOf(currNode) - 1);
+                    }
+                }
     }
 }

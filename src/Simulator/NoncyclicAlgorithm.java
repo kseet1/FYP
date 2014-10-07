@@ -29,28 +29,14 @@ public class NoncyclicAlgorithm {
     }
 
     public void run() {
-        
+
         for (Vehicle vehicle : vehicles) {
             Node currNode = virtualMap.getNode(vehicle.getXCoordinate(), vehicle.getYCoordinate());
 
             int xCoordinate = vehicle.getXCoordinate();
             int yCoordinate = vehicle.getYCoordinate();
             int direction = vehicle.getDirection();
-            int currNodeIndex = visitedNodes.indexOf(currNode);
-            Node nextNodeToVisit;
-            if (!vehicle.isReversed()) {
-                if (currNode == visitedNodes.peekLast()) {
-                    nextNodeToVisit = visitedNodes.peekFirst();
-                } else {
-                    nextNodeToVisit = visitedNodes.get(currNodeIndex + 1);
-                }
-            } else {
-                if (currNode == visitedNodes.peekFirst()) {
-                    nextNodeToVisit = visitedNodes.peekLast();
-                } else {
-                    nextNodeToVisit = visitedNodes.get(currNodeIndex - 1);
-                }
-            }
+            Node nextNodeToVisit = getNextNode(vehicle, currNode);
 
             Node nextNode;
             Node leftNode;
@@ -92,6 +78,12 @@ public class NoncyclicAlgorithm {
                 vehicle.reverseDirection();
                 if (currNode == visitedNodes.peekFirst()) {
                     vehicle.setDirection(EAST);
+                }
+                // reverse the direction of the other vehicle as well
+                // reverse the direction if and only if that vehicle is facing the current vehicle
+                Vehicle tmp = nextNodeToVisit.getVehicles().peekFirst();
+                if (currNode == getNextNode(tmp, virtualMap.getNode(tmp.getXCoordinate(), tmp.getYCoordinate()))) {
+                    tmp.reverseDirection();
                 }
             } else {
                 if (nextNodeToVisit == nextNode) {
@@ -204,5 +196,21 @@ public class NoncyclicAlgorithm {
             currNode = virtualMap.getNode(setupVehicle.getXCoordinate(), setupVehicle.getYCoordinate());
         } while (currNode != startNode);
         virtualMap.getNode(1, 1).remove(setupVehicle);
+    }
+
+    private Node getNextNode(Vehicle vehicle, Node currNode) {
+        if (!vehicle.isReversed()) {
+            if (currNode == visitedNodes.peekLast()) {
+                return visitedNodes.peekFirst();
+            } else {
+                return visitedNodes.get(visitedNodes.indexOf(currNode) + 1);
+            }
+        } else {
+            if (currNode == visitedNodes.peekFirst()) {
+                return visitedNodes.peekLast();
+            } else {
+                return visitedNodes.get(visitedNodes.indexOf(currNode) - 1);
+            }
+        }
     }
 }
