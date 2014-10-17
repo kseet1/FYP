@@ -31,6 +31,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 /**
  *
@@ -49,6 +54,8 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private Thread thread1;
     private Thread thread2;
     private Thread thread3;
+    private LineChart discoveryTimeChart;
+    private LineChart algorithmComparisonChart;
     private int xDimension;
     private int yDimension;
     //private int avgTimeTaken;    //to measure the average time taken for a node to be visited
@@ -116,6 +123,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
         jTextField6 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         jLabel13 = new javax.swing.JLabel();
         jSpinnerHotspots = new javax.swing.JSpinner();
@@ -332,6 +340,13 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jTextField6.setText("");
         jTextField6.setEnabled(false);
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -363,6 +378,9 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(283, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jButton1)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -386,7 +404,9 @@ public class SimulatorGUI extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel18)
                     .addComponent(jTextField6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(63, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton1)
+                .addContainerGap(34, Short.MAX_VALUE))
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Hotspots"));
@@ -612,6 +632,10 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jButtonRemoveVehicleActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     private JSlider getSlider(final JOptionPane optionPane) {
         JSlider slider = new JSlider();
         slider.setMajorTickSpacing(1);
@@ -673,7 +697,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private Color getColor() {
 
         boolean notUsed = false;    //flag to check if color is used by any vehicle
-        
+
         for (Color color : colors) {
             notUsed = false;
             for (Vehicle vehicle : vehicles) {
@@ -682,8 +706,9 @@ public class SimulatorGUI extends javax.swing.JFrame {
                     break;  //break loop and check next color
                 }
             }
-            if (notUsed == false)
+            if (notUsed == false) {
                 return color;
+            }
         }
         return null;
     }
@@ -739,27 +764,50 @@ public class SimulatorGUI extends javax.swing.JFrame {
         private int longestTimeTaken = 0;
         private int avgTimeTaken = 0;
         private int totalTime = 0;
+        private int numberOfFires = 0;
+        private double lastUpdateTime = 0;
         private double discoveryTime = 0;
         private double worstDiscoveryTime = 0;
         private ArrayList<Double> discoveryTimes = new ArrayList<>();
 
         public void run() {
             System.out.println("Running monitoring thread!");
-            int counter = 0;
-            double totalTimeTaken = 0;
+
+            discoveryTimeChart = new LineChart("Time taken to discover fire", "nth Fire", "Time(s)");
+            discoveryTimeChart.setSize(450, 350);
+            discoveryTimeChart.setVisible(true);
+            discoveryTimeChart.addValue(0, "Time", "0");
+            discoveryTimeChart.addValue(0, "Average Time", "0");
+            
+            
+            algorithmComparisonChart = new LineChart("Algorithms' Performance Comparison", "nth Fire", "Estimated Time(s)");
+            algorithmComparisonChart.setSize(450, 350);
+            algorithmComparisonChart.setVisible(true);
+            algorithmComparisonChart.addValue(0, "Cyclic Algorithm", "0");
+            algorithmComparisonChart.addValue(0, "Sweeping Algorithm", "0");
+
+            lastUpdateTime = System.currentTimeMillis();
+            boolean reset = false;
             while (true) {
                 while (this.terminate) {
                     try {
-                        counter = 0;    //reset counters
-                        totalTimeTaken = 0;
-                        longestTimeTaken = 0;
-                        discoveryTime = 0;
-                        worstDiscoveryTime = 0;
-                        discoveryTimes.clear();
+                        reset = true;
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                }
+
+                if (reset) {
+                    discoveryTimeChart.clear();
+                    discoveryTimeChart.addValue(0, "Time", "0");
+                    discoveryTimeChart.addValue(0, "Average Time", "0");
+                    longestTimeTaken = 0;
+                    discoveryTime = 0;
+                    numberOfFires = 0;
+                    worstDiscoveryTime = 0;
+                    discoveryTimes.clear();
+                    reset = false;
                 }
 
                 for (int j = 0; j < virtualMap.getYDimension(); j++) {
@@ -784,6 +832,19 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         }
                     }
                 }
+                if (discoveryTimes.size() != numberOfFires) {
+                    numberOfFires = discoveryTimes.size();
+                    if (!discoveryTimes.isEmpty()) {
+                        discoveryTimeChart.addValue((double) discoveryTimes.get(discoveryTimes.size() - 1) / 1000, "Time", String.valueOf(numberOfFires));
+                        discoveryTimeChart.addValue((double) totalTime/numberOfFires / 1000, "Average Time", String.valueOf(numberOfFires));
+                        if(jComboBox1.getSelectedIndex()==0)
+                            algorithmComparisonChart.addValue((double) totalTime/discoveryTimes.size() / 1000, "Cyclic Algorithm", String.valueOf(numberOfFires));
+                        else if (jComboBox1.getSelectedIndex()==1)
+                            algorithmComparisonChart.addValue((double) totalTime/discoveryTimes.size() / 1000, "Sweeping Algorithm", String.valueOf(numberOfFires));
+                    }
+                    discoveryTimeChart.revalidate();
+                    algorithmComparisonChart.revalidate();
+                }
             }
         }
 
@@ -807,6 +868,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
                         Logger.getLogger(SimulatorGUI.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
+                
                 updateGUI(virtualMap);
                 if (jComboBox1.getSelectedIndex() == 0) {
                     cyclicAlgorithm.run();
@@ -940,6 +1002,7 @@ public class SimulatorGUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel MapPanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButtonAddVehicle;
     private javax.swing.JButton jButtonEditSpeed;
     private javax.swing.JButton jButtonGenerateMap;
