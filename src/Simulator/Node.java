@@ -114,6 +114,10 @@ public class Node {
         return this.isVisited;
     }
     
+    public void setVisited(boolean bool) {
+        this.isVisited = bool;
+    }
+    
     public void setReturnNode(boolean isReturnNode) {
         this.isReturnNode = isReturnNode;
     }

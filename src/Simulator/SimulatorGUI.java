@@ -133,7 +133,6 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1024, 768));
 
         MapPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Map"));
         MapPanel.setPreferredSize(new java.awt.Dimension(600, 600));
@@ -323,6 +322,11 @@ public class SimulatorGUI extends javax.swing.JFrame {
         jTextField4.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jTextField4.setText("");
         jTextField4.setEnabled(false);
+        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField4ActionPerformed(evt);
+            }
+        });
 
         jLabel15.setText("msec");
 
@@ -635,6 +639,10 @@ public class SimulatorGUI extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField4ActionPerformed
 
     private JSlider getSlider(final JOptionPane optionPane) {
         JSlider slider = new JSlider();
